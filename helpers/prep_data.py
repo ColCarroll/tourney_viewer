@@ -17,8 +17,13 @@ with open(SEEDS, 'r') as buff:
              row in csv.DictReader(buff) if int(row['Season']) == SEASON}
 
 preds = []
+expected_fields = {'Id', 'Pred'}
 with open(PREDS, 'r') as buff:
-    for row in csv.DictReader(buff):
+    reader = csv.DictReader(buff)
+    if set(reader.fieldnames) != expected_fields:
+        raise AssertionError('{} fieldnames must be: {} (in any order).  You had {}.'.format(
+            PREDS, ", ".join(map(repr, expected_fields)), ", ".join(map(repr, reader.fieldnames))))
+    for row in reader:
         _, team_one, team_two = row['Id'].split("_")
         preds.append({
             "team_one": "({}) {}".format(seeds[team_one], teams[team_one]),
